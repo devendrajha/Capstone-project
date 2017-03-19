@@ -1,0 +1,47 @@
+setwd("D:\\Aegis\\Dev Capstone Project\\Capstone Project\\Data 3")
+
+list.files()
+
+members_tbl <- read.csv("Members.csv")
+
+claims_tbl <- read.csv("Claims.csv")
+
+labs_cnt <- read.csv("LabCount.csv")
+
+daysinhospital <- read.csv("DaysInHospital_Y3.csv")
+
+target <- read.csv("Target.csv")
+
+drug_count <- read.csv("DrugCount.csv")
+
+
+claims_tbl$MemberID <- as.character(claims_tbl$MemberID)
+daysinhospital$MemberID <- as.character(daysinhospital$MemberID)
+drug_count$MemberID <- as.character(drug_count$MemberID)
+labs_cnt$MemberID <- as.character(labs_cnt$MemberID)
+members_tbl$MemberID <- as.character(members_tbl$MemberID)
+target$MemberID <- as.character(target$MemberID)
+
+
+##Preparing data set
+ins_data <- merge(claims_tbl,daysinhospital, by = "MemberID")
+ins_data <- merge(ins_data,labs_cnt, by = "MemberID")
+colnames(ins_data)
+colnames(ins_data)[match("Year.x",colnames(ins_data))] <- "Year_Claim"
+colnames(ins_data)[match("Year.y",colnames(ins_data))] <- "Year_lab"
+colnames(ins_data)[match("DSFS.x",colnames(ins_data))] <- "DSFX_Claim"
+colnames(ins_data)[match("DSFS.y",colnames(ins_data))] <- "DSFX_lab"
+
+ins_data <- merge(ins_data,members_tbl, by = "MemberID")
+ins_data$"DaysInHospital"
+lst <- setdiff(colnames(ins_data),"DaysInHospital")
+ins_data <- ins_data[,c(lst,"DaysInHospital")]
+
+##Preparing target dataset
+data_y3 <- ins_data[ins_data$Year_Claim %in% c("Y3"),]
+data_y12 <- ins_data[ins_data$Year_Claim %in% c("Y1","Y2"),]
+
+
+#Data Preparation
+install.packages("mlr")
+library(mlr)
